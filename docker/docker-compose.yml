@@ -1,1 +1,69 @@
+version: '3.8'
 
+services:
+  fl-server:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.server
+    ports:
+      - "8000:8000"
+    environment:
+      - ENVIRONMENT=production
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./data/trained_models:/app/data/trained_models
+    networks:
+      - fl-network
+
+  fl-client-1:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.client
+    environment:
+      - CLIENT_ID=client_001
+      - SERVER_URL=http://fl-server:8000
+    depends_on:
+      - fl-server
+    networks:
+      - fl-network
+
+  fl-client-2:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.client
+    environment:
+      - CLIENT_ID=client_002
+      - SERVER_URL=http://fl-server:8000
+    depends_on:
+      - fl-server
+    networks:
+      - fl-network
+
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./docker/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - fl-network
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - ./docker/grafana-dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - prometheus
+    networks:
+      - fl-network
+
+networks:
+  fl-network:
+    driver: bridge
+
+volumes:
+  model-storage:
