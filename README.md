@@ -7,6 +7,10 @@
 
 A secure and privacy-preserving federated learning system enhanced with Zero-Knowledge Proofs for collaborative threat detection without sharing raw data.
 
+## Current status
+
+The Python source files (client, server, tests) and the ZKP circuit and utility files in this repository are empty, so the figures in the Results table cannot be reproduced from the committed code.
+
 ## 🚀 Features
 
 - **Federated Learning**: Train ML models without centralizing data
